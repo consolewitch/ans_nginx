@@ -1,0 +1,31 @@
+---
+- name: "make sure NginX and related requiremetns are installed."
+  yum: name={{ item }} state=present
+  with_items:
+    - epel-release
+    - nginx
+
+- name: "stop iptables :-("
+  service: name=iptables enabled=no state=stopped
+
+- name: "stop nginx if it is already running"
+  service: name=nginx enabled=yes state=stopped
+
+- name: "make sure port {{ portNumber }} isn't still in use after shutting down nginx" 
+  wait_for: port={{ portNumber }} state=stopped timeout=15
+
+- name: "Ensure existance of /var/www/{{ portNumber }}"
+  file: name=/var/www/{{ portNumber }} state=directory
+  #todo: set appropriate permissions, make port number a variable
+
+- name: "copy over {{ portNumber }}.conf to the vm from the templates dir"
+  template: src=vhost.j2 dest=/etc/nginx/conf.d/{{ portNumber }}.conf owner=root group=wheel mode=0644
+
+- name: "copy over temporary index file"
+  copy: src=index.html dest=/var/www/{{ portNumber }}/index.html
+
+- name: "ensure nginx service is set to start on boot"
+  service: name=nginx enabled=yes state=started
+
+#- name: pull down content from a get repo
+#  git: clone={{ repoUrl }}

@@ -1,0 +1,9 @@
+server {
+    listen       {{ portNumber }};
+    server_name  localhost {{ portNumber }};
+
+    location / {
+        root   /var/www/{{ portNumber }};
+        index  index.html index.htm;
+    }
+}

@@ -1,0 +1,7 @@
+---
+- name: build nginx for puppet!
+  hosts: all
+  sudo: yes
+  accelerate: false
+  roles:
+    - common

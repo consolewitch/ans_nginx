@@ -1,7 +1,5 @@
-# --------------------------------------------- #
-# -----probably won't have to change this------ #
-# --------------------------------------------- #
-
 # default port number
-portNumber: 80 
+portNumber: 8000
 
+# default git repo to pull down and serve.
+gitRepo: https://github.com/puppetlabs/exercise-webpage

@@ -1,4 +1,14 @@
 ---
 
 - name: "Enable and start NginX"
-  service: name=nginx enabled=yes state=started
+  service: name=nginx enabled=yes state=restarted
+  notify: 
+  - "Make sure nginx comes up"
+  - "Tell the user where to find her web site."
+
+- name: "Make sure nginx comes up"
+  wait_for: port={{ portNumber }} state=started timeout=20
+
+- name: "Tell the user where to find her web site."
+  debug: msg="your server is available at these addresses {{ ansible_all_ipv4_addresses }} on port {{ portNumber }}"
+

@@ -1,10 +1,10 @@
 ---
-- name: "Location sanity check."
-  debug: msg="NOTICE- RUNNING THIS PLAYBOOK AGAINST {{ ansible_nodename }}"
+- name: "make sure we're running against a RedHat family OS"
+  fail: "This playbook has only been tested against CentOS 6.x Please choose your target system accordingly."
+  when: ansible_os_family != "RedHat"
 
-- name: "Disable the fastest mirror plugin to save time"
-  lineinfile: dest=/etc/yum/pluginconf.d/fastestmirror.conf regexp='^enabled=' line='enabled=0'
-  when: ansible_os_family == "RedHat"
+- name: "Tell the user what system this is running against. "
+  debug: msg="NOTICE- RUNNING THIS PLAYBOOK AGAINST {{ ansible_nodename }}"
 
 - name: "Make sure required software is installed and up to date."
   yum: name={{ item }} state=latest
@@ -14,7 +14,7 @@
     - git
 
 - name: "NOTICE- STOPPING AND DISABLING THE IPTABLES FIREWALL!"
-  service: name=iptables enabled=no state=stopped #must_exist=no #only works in >= ans2.0
+  service: name=iptables enabled=no state=stopped #must_exist=no #must_exist only works in >= ans2.0
 
 - name: "Stop nginx if it is already running."
   service: name=nginx state=stopped
@@ -52,8 +52,6 @@
 - name: "Link your file in to the conf.d."
   file: src=/etc/nginx/conf.available/{{ portNumber }}.conf dest=/etc/nginx/conf.d/{{ portNumber }}.conf state=link owner=root group=root mode=0644
   notify: "Enable and start NginX"
-
-# create webroot
 
 - name: "Ensure existance of /var/www/{{ portNumber }}."
   file: name=/var/www/{{ portNumber }} state=directory owner=root group=root mode=0755
